@@ -4,7 +4,7 @@ def readFile(path):
     return open(path, 'rb').read().decode('utf-8')
 
 def obtenirDocument(path):
-    #print(path)
+    print('documents' + path,"hshhshshshsshshs")
     return readFile('documents' + path)
 
 def extension(path):
