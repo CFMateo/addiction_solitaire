@@ -6,7 +6,7 @@ def init():
 
     # changer le contenu HTML de l'élément racine
     racine = document.querySelector("#cb-body")
-    racine.innerHTML = 
+    racine.innerHTML = """
       <style>
         #jeu table { float:none; }
         #jeu table td { border:0; padding:1px 2px; height:auto; width:auto; }
@@ -24,7 +24,8 @@ def init():
           </tr>
         </table>
       </div>
-
+  """
     # changer la couleur de fond de la case 0
     case0 = document.querySelector("#case0")
     case0.setAttribute("style", "background-color: lime")
+    
