@@ -4,15 +4,33 @@
 
 def melanger(paquet):
     nouveau_paquet = paquet.copy()
+    index_melanges=list(range(52))
     for i in range(51, 0, -1):
         index_aleatoire = randint(0, 51)
-        temporaire = nouveau_paquet[i]
-
+        carte_temporaire = nouveau_paquet[i]
+        index_temporaire=index_melanges[i]
         nouveau_paquet[i] = nouveau_paquet[index_aleatoire]
-        nouveau_paquet[index_aleatoire] = temporaire
-    return nouveau_paquet
+        nouveau_paquet[index_aleatoire] = carte_temporaire
+        index_melanges[i]= index_melanges[index_aleatoire] 
+        index_melanges[index_aleatoire]=index_temporaire 
+    return nouveau_paquet,index_melanges
 
-def lala():
+def options(cartes,paquet_melange):
+    index_trous=[]
+    index=0
+    for carte in paquet_melange:
+        if carte=="empty.svg":
+            index_trous.append(index)
+        index+=1
+    print(index_trous)
+    index_carte_avant_trous=list(map(lambda index_trou: index_trou-1, index_trous))
+    cartes_avant_trous= []
+    for i in index_carte_avant_trous:
+        cartes_avant_trous.append(cartes[i])
+    print(cartes_avant_trous)
+
+ 
+def init():
     cartes = [
         "2C.svg", "2D.svg", "2H.svg", "2S.svg", 
         "3C.svg", "3D.svg", "3H.svg", "3S.svg", 
@@ -28,9 +46,12 @@ def lala():
         "KC.svg", "KD.svg", "KH.svg", "KS.svg", 
         "empty.svg", "empty.svg", "empty.svg", "empty.svg"
     ]
+  
 
-    cartes_melangees = melanger(cartes)
-    
+    cartes_melangees,index_cartes_melangees = melanger(cartes)
+    print(cartes_melangees)
+    print(index_cartes_melangees)
+
 
     contenu_html = (
     "<style>"
@@ -54,6 +75,9 @@ def lala():
     racine = document.querySelector("#cb-body")
     racine.innerHTML = contenu_html
 
+    cartes_jouables=options(index_cartes_melangees,cartes_melangees)
+    
 
-    case0 = document.querySelector("#case0")
-    case0.setAttribute("style", "background-color: lime")
+
+    case6 = document.querySelector("#case6")
+    case6.setAttribute("style", "background-color: lime")
