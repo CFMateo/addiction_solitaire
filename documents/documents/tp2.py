@@ -2,20 +2,18 @@
 # tel qu'indiqué dans la description du TP2.  Le code ici correspond
 # à l'exemple donné dans la description.
 
-def brasser_cartes():
-    pass
-
 def melanger(paquet):
+    nouveau_paquet = paquet.copy()
     for i in range(51, 0, -1):
         index_aleatoire = randint(0, 51)
-        temporaire = paquet[i]
+        temporaire = nouveau_paquet[i]
 
-        paquet[i] = paquet[index_aleatoire]
-        paquet[index_aleatoire] = temporaire
-    return paquet
+        nouveau_paquet[i] = nouveau_paquet[index_aleatoire]
+        nouveau_paquet[index_aleatoire] = temporaire
+    return nouveau_paquet
 
-def init():
-    liste_cartes = [
+def lala():
+    cartes = [
         "2C.svg", "2D.svg", "2H.svg", "2S.svg", 
         "3C.svg", "3D.svg", "3H.svg", "3S.svg", 
         "4C.svg", "4D.svg", "4H.svg", "4S.svg", 
@@ -31,7 +29,7 @@ def init():
         "empty.svg", "empty.svg", "empty.svg", "empty.svg"
     ]
 
-    liste_cartes = melanger(liste_cartes)
+    cartes_melangees = melanger(cartes)
     
 
     contenu_html = (
@@ -48,7 +46,7 @@ def init():
     for i in range(4):
         contenu_html += "<tr>"
         for j in range(13):
-            contenu_html += "<td id='case" + str(index) + "'><img src='cards/" + liste_cartes[index] + "'></td>"
+            contenu_html += "<td id='case" + str(index) + "'><img src='cards/" + cartes_melangees[index] + "'></td>"
             index += 1
         contenu_html += "</tr>"
 
