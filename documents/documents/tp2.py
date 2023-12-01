@@ -2,7 +2,7 @@
 # tel qu'indiqué dans la description du TP2.  Le code ici correspond
 # à l'exemple donné dans la description.
 
-def melanger(paquet):
+def melanger(paquet): 
     nouveau_paquet = paquet.copy()
     index_melanges=list(range(52))
     for i in range(51, 0, -1):
@@ -22,12 +22,28 @@ def options(cartes,paquet_melange):
         if carte=="empty.svg":
             index_trous.append(index)
         index+=1
-    print(index_trous)
     index_carte_avant_trous=list(map(lambda index_trou: index_trou-1, index_trous))
+    index_carte_avant_trous = list(filter(lambda index: index>=0, index_carte_avant_trous))
     cartes_avant_trous= []
     for i in index_carte_avant_trous:
-        cartes_avant_trous.append(cartes[i])
-    print(cartes_avant_trous)
+        if cartes[i]<48:
+            cartes_avant_trous.append(cartes[i])
+    cartes_deplacables=[]
+    for carte_avant in cartes_avant_trous:
+        for carte in cartes:
+            if carte%4==carte_avant%4 and carte//4==(carte_avant//4)+1 and carte<48:
+                cartes_deplacables.append(carte)
+    for i_trou in index_trous:
+        if i_trou==0 or i_trou==13 or i_trou==26 or i_trou==39:
+            for x in range(4): cartes_deplacables.append(x)
+    index_carte_deplacable=[]
+    for carte in cartes_deplacables:
+        for i in range(51):
+            if carte==cartes[i]:
+                index_carte_deplacable.append(i)
+    return index_carte_deplacable
+
+
 
  
 def init():
@@ -45,20 +61,17 @@ def init():
         "QC.svg", "QD.svg", "QH.svg", "QS.svg", 
         "KC.svg", "KD.svg", "KH.svg", "KS.svg", 
         "empty.svg", "empty.svg", "empty.svg", "empty.svg"
-    ]
+        ]
   
 
     cartes_melangees,index_cartes_melangees = melanger(cartes)
-    print(cartes_melangees)
-    print(index_cartes_melangees)
-
 
     contenu_html = (
     "<style>"
     "  #jeu table { float:none; }"
     "  #jeu table td { border:0; padding:1px 2px; height:auto; width:auto; }"
     "  #jeu table td img { height:140px; }"
-    "</style>"
+    "</style>" 
     "<div id='jeu'>"
     "  <table>"
     )
@@ -76,8 +89,9 @@ def init():
     racine.innerHTML = contenu_html
 
     cartes_jouables=options(index_cartes_melangees,cartes_melangees)
-    
+    for carte in cartes_jouables:
+        numero_case="#case"+str(carte)
+        case=document.querySelector(numero_case)
+        case.setAttribute("style", "background-color: lime")
 
 
-    case6 = document.querySelector("#case6")
-    case6.setAttribute("style", "background-color: lime")
