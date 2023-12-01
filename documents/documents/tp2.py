@@ -25,7 +25,7 @@ def options(cartes,paquet_melange):
     index_trous=[]
     index=0
     for carte in paquet_melange:
-        if carte=="empty.svg":
+        if carte=="absent.svg":
             index_trous.append(index)
         index+=1
 
@@ -75,7 +75,7 @@ def init():
         "JC.svg", "JD.svg", "JH.svg", "JS.svg", 
         "QC.svg", "QD.svg", "QH.svg", "QS.svg", 
         "KC.svg", "KD.svg", "KH.svg", "KS.svg", 
-        "empty.svg", "empty.svg", "empty.svg", "empty.svg"
+        "absent.svg", "absent.svg", "absent.svg", "absent.svg"
         ]
   
 
