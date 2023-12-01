@@ -4,48 +4,63 @@
 
 def melanger(paquet): 
     nouveau_paquet = paquet.copy()
-    index_melanges=list(range(52))
+    index_paquet=list(range(52))
     for i in range(51, 0, -1):
         index_aleatoire = randint(0, 51)
+        
+        # Échanger les cartes dans le paquet
         carte_temporaire = nouveau_paquet[i]
-        index_temporaire=index_melanges[i]
         nouveau_paquet[i] = nouveau_paquet[index_aleatoire]
         nouveau_paquet[index_aleatoire] = carte_temporaire
-        index_melanges[i]= index_melanges[index_aleatoire] 
-        index_melanges[index_aleatoire]=index_temporaire 
-    return nouveau_paquet,index_melanges
+
+        # Échanger les index de ces cartes dans le paquet
+        index_temporaire=index_paquet[i]
+        index_paquet[i]= index_paquet[index_aleatoire] 
+        index_paquet[index_aleatoire]=index_temporaire 
+
+    return nouveau_paquet,index_paquet
 
 def options(cartes,paquet_melange):
+    # Indentifier les trous 
     index_trous=[]
     index=0
     for carte in paquet_melange:
         if carte=="empty.svg":
             index_trous.append(index)
         index+=1
+
+    # Identifier les index des cartes positionnées avant les trous 
     index_carte_avant_trous=list(map(lambda index_trou: index_trou-1, index_trous))
-    index_carte_avant_trous = list(filter(lambda index: index>=0, index_carte_avant_trous))
+    index_carte_avant_trous = list(filter(lambda index: index>=0, index_carte_avant_trous)) 
+
+    # Identifier les cartes positionnées avant les trous
     cartes_avant_trous= []
     for i in index_carte_avant_trous:
-        if cartes[i]<48:
-            cartes_avant_trous.append(cartes[i])
+        carte=cartes[i]
+        cartes_avant_trous.append(carte)
+
+    # Identifier les cartes déplaçables
     cartes_deplacables=[]
     for carte_avant in cartes_avant_trous:
         for carte in cartes:
             if carte%4==carte_avant%4 and carte//4==(carte_avant//4)+1 and carte<48:
                 cartes_deplacables.append(carte)
-    for i_trou in index_trous:
-        if i_trou==0 or i_trou==13 or i_trou==26 or i_trou==39:
-            for x in range(4): cartes_deplacables.append(x)
-    index_carte_deplacable=[]
-    for carte in cartes_deplacables:
-        for i in range(51):
-            if carte==cartes[i]:
-                index_carte_deplacable.append(i)
-    return index_carte_deplacable
+    premiere_colonne=[0,13,26,39]                       
+    for i in index_trous:
+        if i in premiere_colonne: # S'il y a un trou dans la première colonne
+            for carte in range(4): cartes_deplacables.append(carte) # Ajouter tous les carte de valeur "2"
+          
+
+    # Identifier les positions des cartes déplaçables 
+    position_carte_deplacable=[]
+    for index_carte in range(51):
+        carte=cartes[index_carte]
+        if carte in cartes_deplacables:
+            position_carte_deplacable.append(index_carte)
+
+    return position_carte_deplacable
 
 
-
- 
 def init():
     cartes = [
         "2C.svg", "2D.svg", "2H.svg", "2S.svg", 
@@ -88,10 +103,14 @@ def init():
     racine = document.querySelector("#cb-body")
     racine.innerHTML = contenu_html
 
-    cartes_jouables=options(index_cartes_melangees,cartes_melangees)
-    for carte in cartes_jouables:
+    cartes_deplacables=options(index_cartes_melangees,cartes_melangees)
+    
+    # Cartes vertes:
+    for carte in cartes_deplacables:
         numero_case="#case"+str(carte)
         case=document.querySelector(numero_case)
         case.setAttribute("style", "background-color: lime")
+    
+
 
 
