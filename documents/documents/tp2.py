@@ -21,6 +21,8 @@ def melanger(paquet):
     return nouveau_paquet,index_paquet
 
 def options(cartes,paquet_melange):
+    premiere_colonne=[0,13,26,39]
+    derniere_colonne=[12,25,38,51]
     # Indentifier les trous 
     index_trous=[]
     index=0
@@ -36,16 +38,17 @@ def options(cartes,paquet_melange):
     # Identifier les cartes positionnées avant les trous
     cartes_avant_trous= []
     for i in index_carte_avant_trous:
-        carte=cartes[i]
-        cartes_avant_trous.append(carte)
+        if i not in derniere_colonne:
+            carte=cartes[i]
+            cartes_avant_trous.append(carte)
 
     # Identifier les cartes déplaçables
+ 
     cartes_deplacables=[]
     for carte_avant in cartes_avant_trous:
         for carte in cartes:
             if carte%4==carte_avant%4 and carte//4==(carte_avant//4)+1 and carte<48:
-                cartes_deplacables.append(carte)
-    premiere_colonne=[0,13,26,39]                       
+                cartes_deplacables.append(carte)                      
     for i in index_trous:
         if i in premiere_colonne: # S'il y a un trou dans la première colonne
             for carte in range(4): cartes_deplacables.append(carte) # Ajouter tous les carte de valeur "2"
