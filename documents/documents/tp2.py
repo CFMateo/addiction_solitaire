@@ -152,31 +152,10 @@ def init():
 
     cartes_melangees,index_cartes_melangees = melanger(cartes)
 
-    
-    contenu_html = (
-    "<style>"
-    "  #jeu table { float:none; }"
-    "  #jeu table td { border:0; padding:1px 2px; height:auto; width:auto; }"
-    "  #jeu table td img { height:140px; }"
-    "</style>" 
-    "<div id='jeu'>"
-    "  <table>"
-    )
+    affichage(cartes_melangees)
 
-    index = 0
-    for i in range(4):
-        contenu_html += "<tr>"
-        for j in range(13):
-            contenu_html += "<td id='case" + str(index) +"' onclick='mise_a_jour(" + str(index) + ")'><img src='cards/" + cartes_melangees[index] + "'></td>"
-            index += 1
-        contenu_html += "</tr>"
-
-
-    racine = document.querySelector("#cb-body")
-    racine.innerHTML = contenu_html
-
-    
     position_cartes_deplacables=options(index_cartes_melangees,cartes_melangees)
+    
     # Cartes vertes:
     cartes_vertes(position_cartes_deplacables)
     
