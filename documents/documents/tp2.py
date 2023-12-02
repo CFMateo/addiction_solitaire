@@ -22,6 +22,11 @@ def melanger(paquet):
         #print(nouveau_paquet)
     return nouveau_paquet,index_paquet
 
+def cartes_vertes(index_cartes):
+    for carte in index_cartes:
+        numero_case="#case"+str(carte)
+        case=document.querySelector(numero_case)
+        case.setAttribute("style", "background-color: lime")
 
 def options(cartes,paquet_melange):
     global index_trous, cartes_avant_trous, cartes_deplacables , position_carte_deplacable, index_carte_avant_trous
@@ -75,7 +80,7 @@ def options(cartes,paquet_melange):
     return position_carte_deplacable
 
 
-def deplacer(position):
+def mise_a_jour(position):
    
     # On determine l'index de la carte clique selon sa position dans le paquet mélangé:
     index_carte_clique = index_paquet[position]
@@ -97,15 +102,15 @@ def deplacer(position):
                 index_paquet[index_trou_associe] = index_paquet[position]
                 index_paquet[position] = temporaire
 
-                print("nouveau_paquet=",nouveau_paquet)
-                print("index_paquet=",index_paquet)
-                mise_a_jour_jeu(nouveau_paquet)
-
+                # Mise a jour du jeux selon l'action éffectué par l'utilisateur:
+                affichage(nouveau_paquet)
+                position_cartes_deplacables=options(index_paquet,nouveau_paquet)
+                cartes_vertes(position_cartes_deplacables)
 
     else:
         pass
 
-def mise_a_jour_jeu(nouvelle_liste_cartes):
+def affichage(nouvelle_liste_cartes):
     contenu_html = (
         "<style>"
         "  #jeu table { float:none; }"
@@ -120,7 +125,7 @@ def mise_a_jour_jeu(nouvelle_liste_cartes):
     for i in range(4):
         contenu_html += "<tr>"
         for j in range(13):
-            contenu_html += "<td id='case" + str(index) + "' onclick='deplacer(" + str(index) + ")'><img src='cards/" + nouvelle_liste_cartes[index] + "'></td>"
+            contenu_html += "<td id='case" + str(index) + "' onclick='mise_a_jour(" + str(index) + ")'><img src='cards/" + nouvelle_liste_cartes[index] + "'></td>"
             index += 1
         contenu_html += "</tr>"
 
@@ -128,7 +133,7 @@ def mise_a_jour_jeu(nouvelle_liste_cartes):
     racine.innerHTML = contenu_html
 
 def init():
-    print()
+    
     cartes = [
         "2C.svg", "2D.svg", "2H.svg", "2S.svg", 
         "3C.svg", "3D.svg", "3H.svg", "3S.svg", 
@@ -144,11 +149,10 @@ def init():
         "KC.svg", "KD.svg", "KH.svg", "KS.svg", 
         "absent.svg", "absent.svg", "absent.svg", "absent.svg"
         ]
-  
 
     cartes_melangees,index_cartes_melangees = melanger(cartes)
 
-
+    
     contenu_html = (
     "<style>"
     "  #jeu table { float:none; }"
@@ -163,7 +167,7 @@ def init():
     for i in range(4):
         contenu_html += "<tr>"
         for j in range(13):
-            contenu_html += "<td id='case" + str(index) +"' onclick='deplacer(" + str(index) + ")'><img src='cards/" + cartes_melangees[index] + "'></td>"
+            contenu_html += "<td id='case" + str(index) +"' onclick='mise_a_jour(" + str(index) + ")'><img src='cards/" + cartes_melangees[index] + "'></td>"
             index += 1
         contenu_html += "</tr>"
 
@@ -171,15 +175,13 @@ def init():
     racine = document.querySelector("#cb-body")
     racine.innerHTML = contenu_html
 
+    
     position_cartes_deplacables=options(index_cartes_melangees,cartes_melangees)
-    #print("position_cartes_deplacables=",position_carte_deplacable)
-    #print("index_paquet=",index_paquet, "nouveau_paquet=",nouveau_paquet)
     # Cartes vertes:
-    for carte in position_cartes_deplacables:
-        numero_case="#case"+str(carte)
-        case=document.querySelector(numero_case)
-        case.setAttribute("style", "background-color: lime")
+    cartes_vertes(position_cartes_deplacables)
+    
     
 
 
 
+#
