@@ -3,6 +3,7 @@
 # à l'exemple donné dans la description.
 
 def melanger(paquet): 
+    global nouveau_paquet, index_paquet
     nouveau_paquet = paquet.copy()
     index_paquet=list(range(52))
     for i in range(51, 0, -1):
@@ -17,10 +18,13 @@ def melanger(paquet):
         index_temporaire=index_paquet[i]
         index_paquet[i]= index_paquet[index_aleatoire] 
         index_paquet[index_aleatoire]=index_temporaire 
-
+        
+        #print(nouveau_paquet)
     return nouveau_paquet,index_paquet
 
+
 def options(cartes,paquet_melange):
+    global index_trous, cartes_avant_trous, cartes_deplacables , position_carte_deplacable, index_carte_avant_trous
     premiere_colonne=[0,13,26,39]
     derniere_colonne=[12,25,38,51]
     # Indentifier les trous 
@@ -31,9 +35,15 @@ def options(cartes,paquet_melange):
             index_trous.append(index)
         index+=1
 
+    #print(index_trous)
     # Identifier les index des cartes positionnées avant les trous 
     index_carte_avant_trous=list(map(lambda index_trou: index_trou-1, index_trous))
     index_carte_avant_trous = list(filter(lambda index: index>=0, index_carte_avant_trous)) 
+    valeurs_a_supprimer = [12, 25, 28]
+    for valeur in valeurs_a_supprimer:
+        while valeur in index_carte_avant_trous:
+            index_carte_avant_trous.remove(valeur)
+    
 
     # Identifier les cartes positionnées avant les trous
     cartes_avant_trous= []
@@ -60,11 +70,65 @@ def options(cartes,paquet_melange):
         carte=cartes[index_carte]
         if carte in cartes_deplacables:
             position_carte_deplacable.append(index_carte)
+    #print("index_trous=",index_trous,"carte_avant_trous=", cartes_avant_trous,"cartes_deplacable=", cartes_deplacables,"index_carte_avant_trous=",index_carte_avant_trous)
 
     return position_carte_deplacable
 
 
+def deplacer(position):
+   
+    # On determine l'index de la carte clique selon sa position dans le paquet mélangé:
+    index_carte_clique = index_paquet[position]
+    #On vérifie si la carte cliqué peut etre déplacer:
+    if position in position_carte_deplacable:
+        for carte in cartes_avant_trous:
+            if index_carte_clique//4 == (carte//4)+1:
+                #print(carte)
+                # On determine quel est l'index du trou associe a la carte:
+                #print(cartes_avant_trous.index(carte))
+                index_carte = cartes_avant_trous.index(carte)
+                #print("index_carte=", index_carte)
+                index_trou_associe = index_carte_avant_trous[index_carte] + 1
+                # On interverti la carte avec le trou  # et met a jour les paquets de cartes et d'indexs:      
+                nouveau_paquet[index_trou_associe] = nouveau_paquet[position]
+                nouveau_paquet[position] = 'absent.svg'
+
+                temporaire = index_paquet[index_trou_associe]
+                index_paquet[index_trou_associe] = index_paquet[position]
+                index_paquet[position] = temporaire
+
+                print("nouveau_paquet=",nouveau_paquet)
+                print("index_paquet=",index_paquet)
+                mise_a_jour_jeu(nouveau_paquet)
+
+
+    else:
+        pass
+
+def mise_a_jour_jeu(nouvelle_liste_cartes):
+    contenu_html = (
+        "<style>"
+        "  #jeu table { float:none; }"
+        "  #jeu table td { border:0; padding:1px 2px; height:auto; width:auto; }"
+        "  #jeu table td img { height:140px; }"
+        "</style>" 
+        "<div id='jeu'>"
+        "  <table>"
+    )
+
+    index = 0
+    for i in range(4):
+        contenu_html += "<tr>"
+        for j in range(13):
+            contenu_html += "<td id='case" + str(index) + "' onclick='deplacer(" + str(index) + ")'><img src='cards/" + nouvelle_liste_cartes[index] + "'></td>"
+            index += 1
+        contenu_html += "</tr>"
+
+    racine = document.querySelector("#cb-body")
+    racine.innerHTML = contenu_html
+
 def init():
+    print()
     cartes = [
         "2C.svg", "2D.svg", "2H.svg", "2S.svg", 
         "3C.svg", "3D.svg", "3H.svg", "3S.svg", 
@@ -84,6 +148,7 @@ def init():
 
     cartes_melangees,index_cartes_melangees = melanger(cartes)
 
+
     contenu_html = (
     "<style>"
     "  #jeu table { float:none; }"
@@ -98,7 +163,7 @@ def init():
     for i in range(4):
         contenu_html += "<tr>"
         for j in range(13):
-            contenu_html += "<td id='case" + str(index) + "'><img src='cards/" + cartes_melangees[index] + "'></td>"
+            contenu_html += "<td id='case" + str(index) +"' onclick='deplacer(" + str(index) + ")'><img src='cards/" + cartes_melangees[index] + "'></td>"
             index += 1
         contenu_html += "</tr>"
 
@@ -106,10 +171,11 @@ def init():
     racine = document.querySelector("#cb-body")
     racine.innerHTML = contenu_html
 
-    cartes_deplacables=options(index_cartes_melangees,cartes_melangees)
-    
+    position_cartes_deplacables=options(index_cartes_melangees,cartes_melangees)
+    #print("position_cartes_deplacables=",position_carte_deplacable)
+    #print("index_paquet=",index_paquet, "nouveau_paquet=",nouveau_paquet)
     # Cartes vertes:
-    for carte in cartes_deplacables:
+    for carte in position_cartes_deplacables:
         numero_case="#case"+str(carte)
         case=document.querySelector(numero_case)
         case.setAttribute("style", "background-color: lime")
