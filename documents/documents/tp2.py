@@ -79,6 +79,13 @@ def options(cartes,paquet_melange):
 
     return position_carte_deplacable
 
+def intervertir(position,index_trou):
+    nouveau_paquet[index_trou] = nouveau_paquet[position]
+    nouveau_paquet[position] = 'absent.svg'
+
+    temporaire = index_paquet[index_trou]
+    index_paquet[index_trou] = index_paquet[position]
+    index_paquet[position] = temporaire
 
 def mise_a_jour(position):
    
@@ -87,26 +94,23 @@ def mise_a_jour(position):
     #On vérifie si la carte cliqué peut etre déplacer:
     if position in position_carte_deplacable:
         for carte in cartes_avant_trous:
-            if index_carte_clique//4 == (carte//4)+1:
-                #print(carte)
+            print(cartes_deplacables)
+            if index_carte_clique//4 == (carte//4)+1: 
                 # On determine quel est l'index du trou associe a la carte:
-                #print(cartes_avant_trous.index(carte))
                 index_carte = cartes_avant_trous.index(carte)
-                #print("index_carte=", index_carte)
                 index_trou_associe = index_carte_avant_trous[index_carte] + 1
                 # On interverti la carte avec le trou  # et met a jour les paquets de cartes et d'indexs:      
-                nouveau_paquet[index_trou_associe] = nouveau_paquet[position]
-                nouveau_paquet[position] = 'absent.svg'
+                intervertir(position,index_trou_associe)
 
-                temporaire = index_paquet[index_trou_associe]
-                index_paquet[index_trou_associe] = index_paquet[position]
-                index_paquet[position] = temporaire
-
-                # Mise a jour du jeux selon l'action éffectué par l'utilisateur:
-                affichage(nouveau_paquet)
-                position_cartes_deplacables=options(index_paquet,nouveau_paquet)
-                cartes_vertes(position_cartes_deplacables)
-
+        if index_carte_clique in [0,1,2,3]: # C'est un deux
+            for trou in index_trous:
+                if trou in [0,13,26,39]: # On identifie dans quel ligne de la premiere colonne est le(s) trou.
+                    intervertir(position,trou)
+            
+        # Mise a jour du jeux selon l'action éffectué par l'utilisateur:
+        affichage(nouveau_paquet)
+        position_cartes_deplacables=options(index_paquet,nouveau_paquet)
+        cartes_vertes(position_cartes_deplacables)
     else:
         pass
 
