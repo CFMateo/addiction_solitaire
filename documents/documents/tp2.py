@@ -110,31 +110,34 @@ def mise_a_jour(position):
         affichage(nouveau_paquet)
         position_cartes_deplacables=options(index_paquet,nouveau_paquet)
         cartes_vertes(position_cartes_deplacables)
+        brasser(index_paquet)
 
     else:
         pass
 
 def brasser(paquet):
-    cartes_a_ne_pas_melanger=[]
+    positions_carte_a_ne_pas_melanger=[]
     nb_rangee=4
     for rangee in range(nb_rangee):
         index_premiere_carte=rangee*13
         premiere_carte=paquet[index_premiere_carte]
         if premiere_carte in [0,1,2,3]: # Si la premiere carte de la rangée est un deux
-            cartes_a_ne_pas_melanger.append(premiere_carte)
+            positions_carte_a_ne_pas_melanger.append(index_premiere_carte)
             compteur=1 # Initialisation du compteur
             while compteur<13:
                 index_carte_actuelle=index_premiere_carte+compteur
                 carte_actuelle=paquet[index_carte_actuelle]
                 carte_avant=paquet[index_carte_actuelle-1]
                 if carte_avant%4==carte_actuelle%4==paquet[index_premiere_carte]%4 and carte_avant//4==(carte_actuelle//4)-1:
-                    cartes_a_ne_pas_melanger.append(carte_actuelle)
+                    positions_carte_a_ne_pas_melanger.append(index_carte_actuelle)
                 else:
                     break
                 compteur+=1
 
-    cartes_a_melanger=list(filter(lambda carte: carte not in cartes_a_ne_pas_melanger, paquet))
+    positions_carte_a_melanger=list(filter(lambda index: index not in positions_carte_a_ne_pas_melanger, paquet))
 
+    
+  
   
     
 
