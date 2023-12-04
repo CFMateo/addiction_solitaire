@@ -2,12 +2,12 @@
 # tel qu'indiqué dans la description du TP2.  Le code ici correspond
 # à l'exemple donné dans la description.
 
-def melanger(paquet): 
+def melanger(paquet,nombre_de_cartes): 
     global nouveau_paquet, index_paquet
     nouveau_paquet = paquet.copy()
-    index_paquet=list(range(52))
-    for i in range(51, 0, -1):
-        index_aleatoire = randint(0, 51)
+    index_paquet=list(range(nombre_de_cartes))
+    for i in range(nombre_de_cartes-1, 0, -1):
+        index_aleatoire = randint(0, nombre_de_cartes-1)
         
         # Échanger les cartes dans le paquet
         carte_temporaire = nouveau_paquet[i]
@@ -44,18 +44,16 @@ def options(cartes,paquet_melange):
     # Identifier les index des cartes positionnées avant les trous 
     index_carte_avant_trous=list(map(lambda index_trou: index_trou-1, index_trous))
     index_carte_avant_trous = list(filter(lambda index: index>=0, index_carte_avant_trous)) 
-    valeurs_a_supprimer = [12, 25, 28]
-    for valeur in valeurs_a_supprimer:
-        while valeur in index_carte_avant_trous:
-            index_carte_avant_trous.remove(valeur)
+    for index in derniere_colonne:
+        while index in index_carte_avant_trous:
+            index_carte_avant_trous.remove(index)
     
 
     # Identifier les cartes positionnées avant les trous
     cartes_avant_trous= []
     for i in index_carte_avant_trous:
-        if i not in derniere_colonne:
-            carte=cartes[i]
-            cartes_avant_trous.append(carte)
+        carte=cartes[i]
+        cartes_avant_trous.append(carte)
 
     # Identifier les cartes déplaçables
  
@@ -71,7 +69,7 @@ def options(cartes,paquet_melange):
 
     # Identifier les positions des cartes déplaçables 
     position_carte_deplacable=[]
-    for index_carte in range(51):
+    for index_carte in range(52):
         carte=cartes[index_carte]
         if carte in cartes_deplacables:
             position_carte_deplacable.append(index_carte)
@@ -87,6 +85,7 @@ def intervertir(position,index_trou):
     index_paquet[index_trou] = index_paquet[position]
     index_paquet[position] = temporaire
 
+
 def mise_a_jour(position):
    
     # On determine l'index de la carte clique selon sa position dans le paquet mélangé:
@@ -94,8 +93,8 @@ def mise_a_jour(position):
     #On vérifie si la carte cliqué peut etre déplacer:
     if position in position_carte_deplacable:
         for carte in cartes_avant_trous:
-            print(cartes_deplacables)
-            if index_carte_clique//4 == (carte//4)+1: 
+            #print(cartes_deplacables)
+            if index_carte_clique//4 == (carte//4)+1 and index_carte_clique%4==carte%4: 
                 # On determine quel est l'index du trou associe a la carte:
                 index_carte = cartes_avant_trous.index(carte)
                 index_trou_associe = index_carte_avant_trous[index_carte] + 1
@@ -111,8 +110,33 @@ def mise_a_jour(position):
         affichage(nouveau_paquet)
         position_cartes_deplacables=options(index_paquet,nouveau_paquet)
         cartes_vertes(position_cartes_deplacables)
+
     else:
         pass
+
+def brasser(paquet):
+    cartes_a_ne_pas_melanger=[]
+    nb_rangee=4
+    for rangee in range(nb_rangee):
+        index_premiere_carte=rangee*13
+        premiere_carte=paquet[index_premiere_carte]
+        if premiere_carte in [0,1,2,3]: # Si la premiere carte de la rangée est un deux
+            cartes_a_ne_pas_melanger.append(premiere_carte)
+            compteur=1 # Initialisation du compteur
+            while compteur<13:
+                index_carte_actuelle=index_premiere_carte+compteur
+                carte_actuelle=paquet[index_carte_actuelle]
+                carte_avant=paquet[index_carte_actuelle-1]
+                if carte_avant%4==carte_actuelle%4==paquet[index_premiere_carte]%4 and carte_avant//4==(carte_actuelle//4)-1:
+                    cartes_a_ne_pas_melanger.append(carte_actuelle)
+                else:
+                    break
+                compteur+=1
+
+    cartes_a_melanger=list(filter(lambda carte: carte not in cartes_a_ne_pas_melanger, paquet))
+
+  
+    
 
 def affichage(nouvelle_liste_cartes):
     contenu_html = (
@@ -132,7 +156,6 @@ def affichage(nouvelle_liste_cartes):
             contenu_html += "<td id='case" + str(index) + "' onclick='mise_a_jour(" + str(index) + ")'><img src='cards/" + nouvelle_liste_cartes[index] + "'></td>"
             index += 1
         contenu_html += "</tr>"
-
     racine = document.querySelector("#cb-body")
     racine.innerHTML = contenu_html
 
@@ -153,12 +176,15 @@ def init():
         "KC.svg", "KD.svg", "KH.svg", "KS.svg", 
         "absent.svg", "absent.svg", "absent.svg", "absent.svg"
         ]
+    
+    nb_de_cartes=len(cartes)
 
-    cartes_melangees,index_cartes_melangees = melanger(cartes)
+    cartes_melangees,index_cartes_melangees = melanger(cartes,nb_de_cartes)
 
     affichage(cartes_melangees)
 
     position_cartes_deplacables=options(index_cartes_melangees,cartes_melangees)
+
     
     # Cartes vertes:
     cartes_vertes(position_cartes_deplacables)
@@ -167,4 +193,3 @@ def init():
 
 
 
-#
