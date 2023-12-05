@@ -16,6 +16,7 @@ cartes = [
         "KC.svg", "KD.svg", "KH.svg", "KS.svg", 
         "absent.svg", "absent.svg", "absent.svg", "absent.svg"
         ]
+nb_de_brasse=3
 def melanger(paquet): 
     global nouveau_paquet, index_paquet
     nouveau_paquet = paquet.copy()
@@ -129,7 +130,8 @@ def mise_a_jour(position):
         pass
 
 def brasser():
-    global nouveau_paquet, index_paquet
+    global nouveau_paquet, index_paquet, nb_de_brasse
+    nb_de_brasse-=1
     paquet=nouveau_paquet.copy()
     num_cartes=index_paquet.copy()
     positions_carte_a_ne_pas_melanger=[]
@@ -152,23 +154,13 @@ def brasser():
                 else:
                     break
                 compteur+=1
-    #print("nepasmel:",num_cartes_a_ne_pas_melanger)
-    #print("nepasmelpos:",positions_carte_a_ne_pas_melanger)
 
     nom_carte_a_ne_pas_melanger=[]
     for position in positions_carte_a_ne_pas_melanger:
         nom_carte=paquet[position]
         nom_carte_a_ne_pas_melanger.append(nom_carte)
-    print("nepasmel:",nom_carte_a_ne_pas_melanger)
 
-    nom_carte_a_melanger=list(filter(lambda carte: carte not in nom_carte_a_ne_pas_melanger,paquet))
-    #print("amel:",nom_carte_a_melanger)
-    #print("nbamel:",len(nom_carte_a_melanger))
-    nb_cartes_a_melanger=len(nom_carte_a_melanger)
     nom_cartes_melanger,index_cartes_melanger=melanger(cartes)
-    #print("mel:",nom_cartes_melanger)
-    #print("mel:",index_cartes_melanger)
-
     if num_cartes_a_ne_pas_melanger!=[]:
         i=0
         n=0
@@ -190,7 +182,6 @@ def brasser():
         num_cartes=index_cartes_melanger
     nouveau_paquet=paquet
     index_paquet=num_cartes
-    print(paquet)    
     affichage(nouveau_paquet)
     position_cartes_deplacables=options(index_paquet,nouveau_paquet)
     # Cartes vertes:
@@ -198,6 +189,7 @@ def brasser():
 
 
 def affichage(nouvelle_liste_cartes):
+    global nb_de_brasse
     contenu_html = (
         "<style>"
         "  #jeu table { float:none; }"
@@ -215,8 +207,12 @@ def affichage(nouvelle_liste_cartes):
             contenu_html += "<td id='case" + str(index) + "' onclick='mise_a_jour(" + str(index) + ")'><img src='cards/" + nouvelle_liste_cartes[index] + "'></td>"
             index += 1
         contenu_html += "</tr>" 
-    contenu_html += "<table>"
-    contenu_html += "Vous pouvez encore <button onclick='brasser()'>Brasser les cartes</button> 3 fois"
+    contenu_html += "<table>"    
+    while nb_de_brasse>0:    
+        contenu_html += "Vous pouvez encore <button onclick='brasser()'>Brasser les cartes</button> "+str(nb_de_brasse)+" fois"
+        break 
+    else: 
+        contenu_html+="Vous ne pouvez plus brasser les cartes"
     contenu_html += "</table>"
 
 
@@ -224,24 +220,6 @@ def affichage(nouvelle_liste_cartes):
     racine.innerHTML = contenu_html
 
 def init():
-    
-    cartes = [
-        "2C.svg", "2D.svg", "2H.svg", "2S.svg", 
-        "3C.svg", "3D.svg", "3H.svg", "3S.svg", 
-        "4C.svg", "4D.svg", "4H.svg", "4S.svg", 
-        "5C.svg", "5D.svg", "5H.svg", "5S.svg", 
-        "6C.svg", "6D.svg", "6H.svg", "6S.svg", 
-        "7C.svg", "7D.svg", "7H.svg", "7S.svg", 
-        "8C.svg", "8D.svg", "8H.svg", "8S.svg", 
-        "9C.svg", "9D.svg", "9H.svg", "9S.svg", 
-        "10C.svg", "10D.svg", "10H.svg", "10S.svg", 
-        "JC.svg", "JD.svg", "JH.svg", "JS.svg", 
-        "QC.svg", "QD.svg", "QH.svg", "QS.svg", 
-        "KC.svg", "KD.svg", "KH.svg", "KS.svg", 
-        "absent.svg", "absent.svg", "absent.svg", "absent.svg"
-        ]
-    
-    nb_de_cartes=len(cartes)
 
     cartes_melangees,index_cartes_melangees = melanger(cartes)
 
