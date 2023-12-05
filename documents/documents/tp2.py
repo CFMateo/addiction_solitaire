@@ -16,13 +16,15 @@ cartes = [
         "KC.svg", "KD.svg", "KH.svg", "KS.svg", 
         "absent.svg", "absent.svg", "absent.svg", "absent.svg"
         ]
+
 nb_de_brasse=3
+
 def melanger(paquet): 
     global nouveau_paquet, index_paquet
     nouveau_paquet = paquet.copy()
     index_paquet=list(range(52))
     for i in range(51, 0, -1):
-        index_aleatoire = randint(0, 51)
+        index_aleatoire = math.floor(random()*52)
         
         # Échanger les cartes dans le paquet
         carte_temporaire = nouveau_paquet[i]
@@ -122,6 +124,7 @@ def mise_a_jour(position):
         affichage(nouveau_paquet)
         position_cartes_deplacables=options(index_paquet,nouveau_paquet)
         cartes_vertes(position_cartes_deplacables)
+        
     else:
         pass
 
