@@ -2,10 +2,18 @@
 # tel qu'indiqué dans la description du TP2.  Le code ici correspond
 # à l'exemple donné dans la description.
 
-def melanger(paquet,nombre_de_cartes): 
+def melanger(paquet,nombre_de_cartes,num_a_ne_pas_melanger): 
     global nouveau_paquet, index_paquet
     nouveau_paquet = paquet.copy()
-    index_paquet=list(range(nombre_de_cartes))
+    if num_a_ne_pas_melanger==None:
+        index_paquet=list(range(nombre_de_cartes))
+    else:
+        index_paquet=[]
+        for index in range(52):
+            if index in num_a_ne_pas_melanger:
+                pass
+            else:
+                index_paquet.append(index) 
     for i in range(nombre_de_cartes-1, 0, -1):
         index_aleatoire = randint(0, nombre_de_cartes-1)
         
@@ -110,36 +118,61 @@ def mise_a_jour(position):
         affichage(nouveau_paquet)
         position_cartes_deplacables=options(index_paquet,nouveau_paquet)
         cartes_vertes(position_cartes_deplacables)
-        brasser(index_paquet)
+        brasser(index_paquet,nouveau_paquet)
 
     else:
         pass
 
-def brasser(paquet):
+def brasser(num_cartes,paquet):
     positions_carte_a_ne_pas_melanger=[]
+    num_cartes_a_ne_pas_melanger=[]
     nb_rangee=4
     for rangee in range(nb_rangee):
         index_premiere_carte=rangee*13
-        premiere_carte=paquet[index_premiere_carte]
+        premiere_carte=num_cartes[index_premiere_carte]
         if premiere_carte in [0,1,2,3]: # Si la premiere carte de la rangée est un deux
             positions_carte_a_ne_pas_melanger.append(index_premiere_carte)
+            num_cartes_a_ne_pas_melanger.append(premiere_carte)
             compteur=1 # Initialisation du compteur
             while compteur<13:
                 index_carte_actuelle=index_premiere_carte+compteur
-                carte_actuelle=paquet[index_carte_actuelle]
-                carte_avant=paquet[index_carte_actuelle-1]
-                if carte_avant%4==carte_actuelle%4==paquet[index_premiere_carte]%4 and carte_avant//4==(carte_actuelle//4)-1:
+                carte_actuelle=num_cartes[index_carte_actuelle]
+                carte_avant=num_cartes[index_carte_actuelle-1]
+                if carte_avant%4==carte_actuelle%4==num_cartes[index_premiere_carte]%4 and carte_avant//4==(carte_actuelle//4)-1:
                     positions_carte_a_ne_pas_melanger.append(index_carte_actuelle)
+                    num_cartes_a_ne_pas_melanger.append(carte_actuelle)
                 else:
                     break
                 compteur+=1
 
-    positions_carte_a_melanger=list(filter(lambda index: index not in positions_carte_a_ne_pas_melanger, paquet))
+    nom_carte_a_ne_pas_melanger=[]
+    for position in positions_carte_a_ne_pas_melanger:
+        nom_carte=paquet[position]
+        nom_carte_a_ne_pas_melanger.append(nom_carte)
 
-    
-  
-  
-    
+    nom_carte_a_melanger=list(filter(lambda carte: carte not in nom_carte_a_ne_pas_melanger, paquet))
+    nb_cartes_a_melanger=len(nom_carte_a_melanger)
+    nom_cartes_melanger,index_cartes_melanger=melanger(nom_carte_a_melanger,nb_cartes_a_melanger,num_cartes_a_ne_pas_melanger)
+
+    paquet_melanger=paquet.copy()
+    index_paquet_melanger=num_cartes.copy()
+    i=0
+    n=0
+    while i<52 and n<nb_cartes_a_melanger:
+        for carte in paquet:
+            if carte in nom_carte_a_ne_pas_melanger:
+                pass
+            else:
+                paquet_melanger[i]=nom_cartes_melanger[n]
+                index_paquet_melanger[i]=index_cartes_melanger[n]
+                n+=1
+            i+=1
+
+    affichage(paquet_melanger)
+    position_cartes_deplacables=options(index_paquet_melanger,paquet_melanger)
+    # Cartes vertes:
+    cartes_vertes(position_cartes_deplacables)
+
 
 def affichage(nouvelle_liste_cartes):
     contenu_html = (
@@ -182,12 +215,11 @@ def init():
     
     nb_de_cartes=len(cartes)
 
-    cartes_melangees,index_cartes_melangees = melanger(cartes,nb_de_cartes)
+    cartes_melangees,index_cartes_melangees = melanger(cartes,nb_de_cartes,None)
 
     affichage(cartes_melangees)
 
     position_cartes_deplacables=options(index_cartes_melangees,cartes_melangees)
-
     
     # Cartes vertes:
     cartes_vertes(position_cartes_deplacables)
