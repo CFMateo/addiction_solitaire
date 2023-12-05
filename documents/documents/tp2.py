@@ -33,8 +33,6 @@ def melanger(paquet):
         index_temporaire=index_paquet[i]
         index_paquet[i]= index_paquet[index_aleatoire] 
         index_paquet[index_aleatoire]=index_temporaire 
-        #print("index_paquet", index_paquet)
-        #print("nomsmel",nouveau_paquet)
         
     return nouveau_paquet,index_paquet
 
@@ -56,7 +54,6 @@ def options(cartes,paquet_melange):
             index_trous.append(index)
         index+=1
 
-    #print(index_trous)
     # Identifier les index des cartes positionnées avant les trous 
     index_carte_avant_trous=list(map(lambda index_trou: index_trou-1, index_trous))
     index_carte_avant_trous = list(filter(lambda index: index>=0, index_carte_avant_trous)) 
@@ -89,7 +86,7 @@ def options(cartes,paquet_melange):
         carte=cartes[index_carte]
         if carte in cartes_deplacables:
             position_carte_deplacable.append(index_carte)
-    #print("index_trous=",index_trous,"carte_avant_trous=", cartes_avant_trous,"cartes_deplacable=", cartes_deplacables,"index_carte_avant_trous=",index_carte_avant_trous)
+
 
     return position_carte_deplacable
 
@@ -109,7 +106,6 @@ def mise_a_jour(position):
     #On vérifie si la carte cliqué peut etre déplacer:
     if position in position_carte_deplacable:
         for carte in cartes_avant_trous:
-            #print(cartes_deplacables)
             if index_carte_clique//4 == (carte//4)+1 and index_carte_clique%4==carte%4: 
                 # On determine quel est l'index du trou associe a la carte:
                 index_carte = cartes_avant_trous.index(carte)
@@ -167,7 +163,6 @@ def brasser():
         while i<52 and n<52:
             for carte in paquet:
                 if carte in nom_carte_a_ne_pas_melanger:
-                    print(carte)
                     pass
                 else:
                     while nom_cartes_melanger[n] in nom_carte_a_ne_pas_melanger:
@@ -186,6 +181,12 @@ def brasser():
     position_cartes_deplacables=options(index_paquet,nouveau_paquet)
     # Cartes vertes:
     cartes_vertes(position_cartes_deplacables)
+
+def recommencer():
+    global nb_de_brasse, nouveau_paquet
+    nb_de_brasse=3
+    nouveau_paquet=cartes
+    init()
 
 
 def affichage(nouvelle_liste_cartes):
@@ -214,6 +215,7 @@ def affichage(nouvelle_liste_cartes):
     else: 
         contenu_html+="Vous ne pouvez plus brasser les cartes"
     contenu_html += "</table>"
+    contenu_html+="<button onclick='recommencer()'>Nouvelle partie</button>"
 
 
     racine = document.querySelector("#cb-body")
