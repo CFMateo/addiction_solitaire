@@ -1,23 +1,27 @@
 # Vous devez remplacer le contenu de ce fichier par votre propre code
 # tel qu'indiqué dans la description du TP2.  Le code ici correspond
 # à l'exemple donné dans la description.
-
-def melanger(paquet,nombre_de_cartes,num_a_ne_pas_melanger): 
+cartes = [
+        "2C.svg", "2D.svg", "2H.svg", "2S.svg", 
+        "3C.svg", "3D.svg", "3H.svg", "3S.svg", 
+        "4C.svg", "4D.svg", "4H.svg", "4S.svg", 
+        "5C.svg", "5D.svg", "5H.svg", "5S.svg", 
+        "6C.svg", "6D.svg", "6H.svg", "6S.svg", 
+        "7C.svg", "7D.svg", "7H.svg", "7S.svg", 
+        "8C.svg", "8D.svg", "8H.svg", "8S.svg", 
+        "9C.svg", "9D.svg", "9H.svg", "9S.svg", 
+        "10C.svg", "10D.svg", "10H.svg", "10S.svg", 
+        "JC.svg", "JD.svg", "JH.svg", "JS.svg", 
+        "QC.svg", "QD.svg", "QH.svg", "QS.svg", 
+        "KC.svg", "KD.svg", "KH.svg", "KS.svg", 
+        "absent.svg", "absent.svg", "absent.svg", "absent.svg"
+        ]
+def melanger(paquet): 
     global nouveau_paquet, index_paquet
     nouveau_paquet = paquet.copy()
-    if num_a_ne_pas_melanger==None or num_a_ne_pas_melanger==[]:
-        print("a")
-        index_paquet=list(range(nombre_de_cartes))
-    else:
-        print("b")
-        index_paquet=[]
-        for index in range(52):
-            if index in num_a_ne_pas_melanger:
-                pass
-            else:
-                index_paquet.append(index) 
-    for i in range(nombre_de_cartes-1, 0, -1):
-        index_aleatoire = randint(0, nombre_de_cartes-1)
+    index_paquet=list(range(52))
+    for i in range(51, 0, -1):
+        index_aleatoire = randint(0, 51)
         
         # Échanger les cartes dans le paquet
         carte_temporaire = nouveau_paquet[i]
@@ -125,6 +129,7 @@ def mise_a_jour(position):
         pass
 
 def brasser():
+    global nouveau_paquet, index_paquet
     paquet=nouveau_paquet.copy()
     num_cartes=index_paquet.copy()
     positions_carte_a_ne_pas_melanger=[]
@@ -154,36 +159,40 @@ def brasser():
     for position in positions_carte_a_ne_pas_melanger:
         nom_carte=paquet[position]
         nom_carte_a_ne_pas_melanger.append(nom_carte)
-    #print("nepasmel:",nom_carte_a_ne_pas_melanger)
+    print("nepasmel:",nom_carte_a_ne_pas_melanger)
 
     nom_carte_a_melanger=list(filter(lambda carte: carte not in nom_carte_a_ne_pas_melanger,paquet))
     #print("amel:",nom_carte_a_melanger)
     #print("nbamel:",len(nom_carte_a_melanger))
     nb_cartes_a_melanger=len(nom_carte_a_melanger)
-    nom_cartes_melanger,index_cartes_melanger=melanger(nom_carte_a_melanger,nb_cartes_a_melanger,num_cartes_a_ne_pas_melanger)
+    nom_cartes_melanger,index_cartes_melanger=melanger(cartes)
     #print("mel:",nom_cartes_melanger)
     #print("mel:",index_cartes_melanger)
 
     if num_cartes_a_ne_pas_melanger!=[]:
-
-        paquet_melanger=paquet.copy()
-        index_paquet_melanger=num_cartes.copy()
         i=0
         n=0
-        while i<52 and n<nb_cartes_a_melanger:
+        while i<52 and n<52:
             for carte in paquet:
                 if carte in nom_carte_a_ne_pas_melanger:
+                    print(carte)
                     pass
                 else:
-                    paquet_melanger[i]=nom_cartes_melanger[n]
-                    index_paquet_melanger[i]=index_cartes_melanger[n]
-                    n+=1
+                    while nom_cartes_melanger[n] in nom_carte_a_ne_pas_melanger:
+                        n+=1
+                    else:
+                        paquet[i]=nom_cartes_melanger[n]
+                        num_cartes[i]=index_cartes_melanger[n]
+                        n+=1
                 i+=1
     else:
-        paquet_melanger=nom_cartes_melanger
-        index_paquet_melanger=index_cartes_melanger
-    affichage(paquet_melanger)
-    position_cartes_deplacables=options(index_paquet_melanger,paquet_melanger)
+        paquet=nom_cartes_melanger
+        num_cartes=index_cartes_melanger
+    nouveau_paquet=paquet
+    index_paquet=num_cartes
+    print(paquet)    
+    affichage(nouveau_paquet)
+    position_cartes_deplacables=options(index_paquet,nouveau_paquet)
     # Cartes vertes:
     cartes_vertes(position_cartes_deplacables)
 
@@ -234,7 +243,7 @@ def init():
     
     nb_de_cartes=len(cartes)
 
-    cartes_melangees,index_cartes_melangees = melanger(cartes,nb_de_cartes,None)
+    cartes_melangees,index_cartes_melangees = melanger(cartes)
 
     affichage(cartes_melangees)
 
