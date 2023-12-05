@@ -5,9 +5,11 @@
 def melanger(paquet,nombre_de_cartes,num_a_ne_pas_melanger): 
     global nouveau_paquet, index_paquet
     nouveau_paquet = paquet.copy()
-    if num_a_ne_pas_melanger==None:
+    if num_a_ne_pas_melanger==None or num_a_ne_pas_melanger==[]:
+        print("a")
         index_paquet=list(range(nombre_de_cartes))
     else:
+        print("b")
         index_paquet=[]
         for index in range(52):
             if index in num_a_ne_pas_melanger:
@@ -26,8 +28,9 @@ def melanger(paquet,nombre_de_cartes,num_a_ne_pas_melanger):
         index_temporaire=index_paquet[i]
         index_paquet[i]= index_paquet[index_aleatoire] 
         index_paquet[index_aleatoire]=index_temporaire 
+        #print("index_paquet", index_paquet)
+        #print("nomsmel",nouveau_paquet)
         
-        #print(nouveau_paquet)
     return nouveau_paquet,index_paquet
 
 def cartes_vertes(index_cartes):
@@ -118,12 +121,12 @@ def mise_a_jour(position):
         affichage(nouveau_paquet)
         position_cartes_deplacables=options(index_paquet,nouveau_paquet)
         cartes_vertes(position_cartes_deplacables)
-        brasser(index_paquet,nouveau_paquet)
-
     else:
         pass
 
-def brasser(num_cartes,paquet):
+def brasser():
+    paquet=nouveau_paquet.copy()
+    num_cartes=index_paquet.copy()
     positions_carte_a_ne_pas_melanger=[]
     num_cartes_a_ne_pas_melanger=[]
     nb_rangee=4
@@ -144,30 +147,41 @@ def brasser(num_cartes,paquet):
                 else:
                     break
                 compteur+=1
+    #print("nepasmel:",num_cartes_a_ne_pas_melanger)
+    #print("nepasmelpos:",positions_carte_a_ne_pas_melanger)
 
     nom_carte_a_ne_pas_melanger=[]
     for position in positions_carte_a_ne_pas_melanger:
         nom_carte=paquet[position]
         nom_carte_a_ne_pas_melanger.append(nom_carte)
+    #print("nepasmel:",nom_carte_a_ne_pas_melanger)
 
-    nom_carte_a_melanger=list(filter(lambda carte: carte not in nom_carte_a_ne_pas_melanger, paquet))
+    nom_carte_a_melanger=list(filter(lambda carte: carte not in nom_carte_a_ne_pas_melanger,paquet))
+    #print("amel:",nom_carte_a_melanger)
+    #print("nbamel:",len(nom_carte_a_melanger))
     nb_cartes_a_melanger=len(nom_carte_a_melanger)
     nom_cartes_melanger,index_cartes_melanger=melanger(nom_carte_a_melanger,nb_cartes_a_melanger,num_cartes_a_ne_pas_melanger)
+    #print("mel:",nom_cartes_melanger)
+    #print("mel:",index_cartes_melanger)
 
-    paquet_melanger=paquet.copy()
-    index_paquet_melanger=num_cartes.copy()
-    i=0
-    n=0
-    while i<52 and n<nb_cartes_a_melanger:
-        for carte in paquet:
-            if carte in nom_carte_a_ne_pas_melanger:
-                pass
-            else:
-                paquet_melanger[i]=nom_cartes_melanger[n]
-                index_paquet_melanger[i]=index_cartes_melanger[n]
-                n+=1
-            i+=1
+    if num_cartes_a_ne_pas_melanger!=[]:
 
+        paquet_melanger=paquet.copy()
+        index_paquet_melanger=num_cartes.copy()
+        i=0
+        n=0
+        while i<52 and n<nb_cartes_a_melanger:
+            for carte in paquet:
+                if carte in nom_carte_a_ne_pas_melanger:
+                    pass
+                else:
+                    paquet_melanger[i]=nom_cartes_melanger[n]
+                    index_paquet_melanger[i]=index_cartes_melanger[n]
+                    n+=1
+                i+=1
+    else:
+        paquet_melanger=nom_cartes_melanger
+        index_paquet_melanger=index_cartes_melanger
     affichage(paquet_melanger)
     position_cartes_deplacables=options(index_paquet_melanger,paquet_melanger)
     # Cartes vertes:
@@ -191,7 +205,12 @@ def affichage(nouvelle_liste_cartes):
         for j in range(13):
             contenu_html += "<td id='case" + str(index) + "' onclick='mise_a_jour(" + str(index) + ")'><img src='cards/" + nouvelle_liste_cartes[index] + "'></td>"
             index += 1
-        contenu_html += "</tr>"
+        contenu_html += "</tr>" 
+    contenu_html += "<table>"
+    contenu_html += "Vous pouvez encore <button onclick='brasser()'>Brasser les cartes</button> 3 fois"
+    contenu_html += "</table>"
+
+
     racine = document.querySelector("#cb-body")
     racine.innerHTML = contenu_html
 
