@@ -123,9 +123,21 @@ def mise_a_jour(position):
                     intervertir(position,trou)
             
         # Mise a jour du jeux selon l'action éffectué par l'utilisateur:
-        affichage(nouveau_paquet)
+        situation = gagner()
+        
+
         position_cartes_deplacables=options(index_paquet,nouveau_paquet)
+
+        if situation: 
+            situation = 1 # Le joueur a gagné
+        elif cartes_deplacables == [] and nb_de_brasse == 0:
+            situation = 2 # Le joueur a perdu
+        elif cartes_deplacables == [] and nb_de_brasse != 0:
+            situation = 3 # Le joueur doit brasser
+
+        affichage(nouveau_paquet,situation)
         cartes_vertes(position_cartes_deplacables)
+
         
     else:
         pass
@@ -182,7 +194,7 @@ def brasser():
         num_cartes=index_cartes_melanger
     nouveau_paquet=paquet
     index_paquet=num_cartes
-    affichage(nouveau_paquet)
+    affichage(nouveau_paquet,False)
     position_cartes_deplacables=options(index_paquet,nouveau_paquet)
     # Cartes vertes:
     cartes_vertes(position_cartes_deplacables)
@@ -194,10 +206,32 @@ def recommencer():
     init()
 
 def gagner():
-    pass
+    victoire = False
+    lignes = []
+    ligne1 = index_paquet[0:12]
+    ligne2 = index_paquet[13:25]
+    ligne3 = index_paquet[26:38]
+    ligne4 = index_paquet[38:52]
+
+    lignes.append(ligne1)
+    lignes.append(ligne2)
+    lignes.append(ligne3)
+    lignes.append(ligne4)
+
+    for ligne in lignes:
+        index = 0 
+        for carte in ligne:
+            if index in [12,25,38,52]:
+                continue
+            elif carte%4==ligne[index+1]%4 and carte//4==ligne[index+1]//4:
+                index+=1
+            else:
+                return False
+    
+    return True
 
 
-def affichage(nouvelle_liste_cartes):
+def affichage(nouvelle_liste_cartes,situation):
     global nb_de_brasse
     contenu_html = (
         "<style>"
@@ -216,14 +250,25 @@ def affichage(nouvelle_liste_cartes):
             contenu_html += "<td id='case" + str(index) + "' onclick='mise_a_jour(" + str(index) + ")'><img src='cards/" + nouvelle_liste_cartes[index] + "'></td>"
             index += 1
         contenu_html += "</tr>" 
-    contenu_html += "<table>"    
-    while nb_de_brasse>0:    
-        contenu_html += "Vous pouvez encore <button onclick='brasser()'>Brasser les cartes</button> "+str(nb_de_brasse)+" fois"
-        break 
-    else: 
-        contenu_html+="Vous ne pouvez plus brasser les cartes"
+    contenu_html += "<table>" 
+    if not situation:
+        while nb_de_brasse>0:    
+            contenu_html += "Vous pouvez encore <button onclick='brasser()'>Brasser les cartes</button> "+str(nb_de_brasse)+" fois"
+            break 
+        else: 
+            contenu_html+="Vous ne pouvez plus brasser les cartes"
+            
+
+    elif situation == 1: 
+        contenu_html += "Vous avez réussi!  Bravo!"
+    elif situation == 2: 
+        contenu_html+= "Vous n'avez pas réussi à placer toutes les cartes... Essayez à nouveau!"
+    elif situation == 3: 
+        contenu_html += "<button onclick='brasser()'>Vous devez brasser.</button>"
+
     contenu_html += "</table>"
     contenu_html+="<button onclick='recommencer()'>Nouvelle partie</button>"
+
 
 
 
@@ -239,7 +284,7 @@ def init():
 
     cartes_melangees,index_cartes_melangees = melanger(cartes)
 
-    affichage(cartes_melangees)
+    affichage(cartes_melangees,False)
 
     position_cartes_deplacables=options(index_cartes_melangees,cartes_melangees)
     
