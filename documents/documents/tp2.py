@@ -1,6 +1,8 @@
-# Vous devez remplacer le contenu de ce fichier par votre propre code
-# tel qu'indiqué dans la description du TP2.  Le code ici correspond
-# à l'exemple donné dans la description.
+# Maxine Dussault et Mateo Coda-Forno
+# 8 décembre 2023
+
+# Description 
+
 cartes = [
         "2C.svg", "2D.svg", "2H.svg", "2S.svg", 
         "3C.svg", "3D.svg", "3H.svg", "3S.svg", 
@@ -191,6 +193,9 @@ def recommencer():
     nouveau_paquet=cartes
     init()
 
+def gagner():
+    pass
+
 
 def affichage(nouvelle_liste_cartes):
     global nb_de_brasse
@@ -221,6 +226,12 @@ def affichage(nouvelle_liste_cartes):
     contenu_html+="<button onclick='recommencer()'>Nouvelle partie</button>"
 
 
+
+
+
+
+
+
     racine = document.querySelector("#cb-body")
     racine.innerHTML = contenu_html
 
@@ -234,6 +245,11 @@ def init():
     
     # Cartes vertes:
     cartes_vertes(position_cartes_deplacables)
+
+    if nb_de_brasse==0 and len(cartes_vertes)==0:
+        print("Vous avez perdu")
+
+    
     
     
 
