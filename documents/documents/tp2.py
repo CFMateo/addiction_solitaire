@@ -99,7 +99,7 @@ def options(num_cartes,paquet_melange):
                 num_cartes_deplacables.append(carte)                      
     for position in position_trous:
         if position in premiere_colonne: # S'il y a un trou dans la première colonne
-            num_cartes_deplacables.append(num_cartes_deux) # Ajouter tous les carte de valeur "2"
+             for carte in range(4):num_cartes_deplacables.append(carte) # Ajouter tous les carte de valeur "2"
           
     # Identifier les positions des cartes déplaçables 
     position_carte_deplacable=[]
