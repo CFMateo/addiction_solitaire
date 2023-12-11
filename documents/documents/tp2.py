@@ -226,6 +226,9 @@ def gagner():
         if rangee[index] in num_cartes_deux: 
             for carte in rangee:
                 if index==0: index+=1 # Ignorer le 2
+                # Si c'est un carte vide:
+                elif carte in [48,49,50,51]:
+                    break
                 else:
                     # Vérifier s'il y a une séquence croissante de même couleur
                     carte_avant=rangee[index-1]
