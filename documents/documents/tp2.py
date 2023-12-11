@@ -1,7 +1,11 @@
 # Maxine Dussault et Mateo Coda-Forno
 # 8 décembre 2023
 
-# Ce programme permet la création du jeu Addiction Solitaire.
+# Ce programme implémente le jeu de cartes "Addiction Solitaire". 
+# Ce jeu est une version de solitaire qui utilise un jeu de 52 cartes standard.
+# L'objectif du jeu est de disposer toutes les cartes en séquences ascendantes de même couleur, 
+# en commençant par les "2". Il ya des options tels que brasser, ou recommencer une partie qui sont 
+# proposer a l'utilisateur.
 
 cartes = [
         "2C.svg", "2D.svg", "2H.svg", "2S.svg", 
@@ -39,6 +43,7 @@ nb_rangee=4
 # La fonction retourne le tableau de cartes mélangés et un tableau
 # de nombres entiers représentant les index des cartes de ce dernier tableau.
 def melanger(paquet): 
+    print(paquet,"haha")
     global nouveau_paquet, index_paquet
     nouveau_paquet = paquet.copy()
     index_paquet=list(range(nb_de_cartes))
@@ -55,11 +60,17 @@ def melanger(paquet):
         index_temporaire=index_paquet[i]
         index_paquet[i]= index_paquet[index_aleatoire] 
         index_paquet[index_aleatoire]=index_temporaire 
-        
+    print(nouveau_paquet,index_paquet,'hihi')
     return nouveau_paquet,index_paquet
 
 def test_melanger():
-    pass
+    paquet = ['2C.svg', '2D.svg', '2H.svg', '2S.svg', '3C.svg', '3D.svg', '3H.svg', '3S.svg', '4C.svg', '4D.svg', '4H.svg',\
+                 '4S.svg', '5C.svg', '5D.svg', '5H.svg', '5S.svg', '6C.svg', '6D.svg', '6H.svg', '6S.svg', '7C.svg', '7D.svg', '7H.svg', '7S.svg', \
+                '8C.svg', '8D.svg', '8H.svg', '8S.svg', '9C.svg', '9D.svg', '9H.svg', '9S.svg', '10C.svg', '10D.svg', '10H.svg', '10S.svg', 'JC.svg', 'JD.svg', 'JH.svg', \
+                    'JS.svg', 'QC.svg', 'QD.svg', 'QH.svg', 'QS.svg', 'KC.svg', 'KD.svg', 'KH.svg', 'KS.svg', 'absent.svg', 'absent.svg', 'absent.svg', 'absent.svg']
+    
+    nouveau_paquet, positions = melanger(paquet)
+    assert(paquet!=nouveau_paquet)
 
 # La fonction options prend en paramètre un tableau d'entiers représentant
 # les numéros des cartes mélangées et un tableau de chaîne de caractères
@@ -111,7 +122,29 @@ def options(num_cartes,paquet_melange):
     return position_carte_deplacable
 
 def test_options():
-    pass
+    # Cas basique:
+    assert options([26, 2, 15, 12, 36, 24, 18, 3, 34, 30, 23, 9, 8, 10, 37, 20, 43, 1, 4, 31, 40, 11, 14, 46, 39, 25, 0, 5, 41, 47, 6, 28, 32, 7, 22,\
+                   48, 13, 17, 29, 19, 50, 27, 38, 35, 21, 33, 51, 45, 49, 42, 16, 44],\
+                    ['8H.svg', '2H.svg', '5S.svg', '5C.svg', 'JC.svg', '8C.svg', '6H.svg', \
+                    '2S.svg', '10H.svg', '9H.svg', '7S.svg', '4D.svg', '4C.svg', '4H.svg', 'JD.svg', \
+                    '7C.svg', 'QS.svg', '2D.svg', '3C.svg', '9S.svg', 'QC.svg', '4S.svg', '5H.svg', 'KH.svg', 'JS.svg', '8D.svg', '2C.svg', \
+                    '3D.svg', 'QD.svg', 'KS.svg', '3H.svg', '9C.svg', '10C.svg', '3S.svg', '7H.svg', 'absent.svg', '5D.svg', '6D.svg', '9D.svg', '6S.svg', 'absent.svg',\
+                    '8S.svg', 'JH.svg', '10S.svg', '7D.svg', '10D.svg', 'absent.svg', 'KD.svg', 'absent.svg', 'QH.svg', '6C.svg', 'KC.svg'] ) == [0, 10, 14]
+    # Cas ou il faut pouvoir déplacer des 2 dans la première colonne:
+    assert options([2, 6, 49, 47, 20, 13, 44, 29, 3, 9, 46, 16, 36, 38, 4, 33, 40, 42, 25, 7, 21, 51, 45, 22, 18, 10, 28, 14, 17, 11, 43, 8, 27, 1, 26,\
+                     50, 19, 39, 34, 48, 30, 23, 15, 5, 32, 35, 31, 37, 0, 12, 24, 41], \
+                    ['2H.svg', '3H.svg', 'absent.svg', 'KS.svg', '7C.svg', '5D.svg', 'KC.svg', '9D.svg', '2S.svg', '4D.svg', 'KH.svg', '6C.svg', 'JC.svg', \
+                     'JH.svg', '3C.svg', '10D.svg', 'QC.svg', 'QH.svg', '8D.svg', '3S.svg', '7D.svg', 'absent.svg', 'KD.svg', '7H.svg', '6H.svg', '4H.svg', \
+                    '9C.svg', '5H.svg', '6D.svg', '4S.svg', 'QS.svg', '4C.svg', '8S.svg', '2D.svg', '8H.svg', 'absent.svg', '6S.svg', 'JS.svg', '10H.svg', \
+                    'absent.svg', '9H.svg', '7S.svg', '5S.svg', '3D.svg', '10C.svg', '10S.svg', '9S.svg', 'JD.svg', '2C.svg', '5C.svg', '8C.svg', 'QD.svg']) == [0, 8, 18, 25, 33, 40, 48]
+    
+    # Cas ou on ne peut plus bougerde cartes:
+    assert options([2, 6, 10, 14, 18, 24, 44, 51, 49, 48, 41, 45, 36, 38, 4, 8, 40, 42, 46, 50, 21, 25, 29, 33, 37, 22, 28, 32, 17, 11, 43, 47, 27, 1, 26, 30,\
+                    19, 39, 34, 3, 7, 23, 15, 5, 9, 13, 31, 35, 0, 12, 16, 20],\
+                     ['2H.svg', '3H.svg', '4H.svg', '5H.svg', '6H.svg', '8C.svg', 'KC.svg', 'absent.svg', 'absent.svg', 'absent.svg', 'QD.svg', 'KD.svg', 'JC.svg',\
+                       'JH.svg', '3C.svg', '4C.svg', 'QC.svg', 'QH.svg', 'KH.svg', 'absent.svg', '7D.svg', '8D.svg', '9D.svg', '10D.svg', 'JD.svg', '7H.svg', '9C.svg', '10C.svg', '6D.svg',\
+                          '4S.svg', 'QS.svg', 'KS.svg', '8S.svg', '2D.svg', '8H.svg', '9H.svg', '6S.svg', 'JS.svg', '10H.svg', '2S.svg', '3S.svg', '7S.svg', '5S.svg', '3D.svg', '4D.svg', '5D.svg', \
+                            '9S.svg', '10S.svg', '2C.svg', '5C.svg', '6C.svg', '7C.svg']) == []
 
 # La procédure cartes_vartes prend en paramètres un tableau de nombres
 # entiers représentants les positions des cartes qu'il faut mettre en vert.
@@ -196,13 +229,13 @@ def mise_a_jour(position_cliquee):
             situation = 2 # Le joueur a perdu
         elif num_cartes_deplacables == [] and nb_de_brasse != 0:
             situation = 3 # Le joueur doit brasser
-
+        print(index_paquet,nouveau_paquet,"lolilol")
         position_cartes_deplacables=options(index_paquet,nouveau_paquet)
 
         # Mise à jour de l'affichage:
         affichage(nouveau_paquet,situation) 
         cartes_vertes(position_cartes_deplacables) 
-
+        print(position_cartes_deplacables)
     # S'il y a rien à mettre à jour:
     else:
         pass 
@@ -355,7 +388,10 @@ def affichage(nouvelle_liste_cartes,situation):
     racine.innerHTML = contenu_html
 
 def init():
-
+    # Tests unitaires:
+    test_melanger()
+    test_options()
+    
     cartes_melangees,index_cartes_melangees = melanger(cartes)
 
     affichage(cartes_melangees,False)
@@ -363,6 +399,8 @@ def init():
     position_cartes_deplacables=options(index_cartes_melangees,cartes_melangees)
     
     cartes_vertes(position_cartes_deplacables)
+
+    
 
     
 
