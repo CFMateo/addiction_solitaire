@@ -1,7 +1,7 @@
 # Maxine Dussault et Mateo Coda-Forno
 # 8 décembre 2023
 
-# Description 
+# Ce programme permet la création du jeu Addiction Solitaire.
 
 cartes = [
         "2C.svg", "2D.svg", "2H.svg", "2S.svg", 
@@ -19,14 +19,32 @@ cartes = [
         "absent.svg", "absent.svg", "absent.svg", "absent.svg"
         ]
 
-nb_de_brasse=3
+nb_de_cartes=len(cartes)
 
+nb_de_brasse=3 # Nombre de brassé permis à l'utilisateur initialement
+ 
+num_cartes_deux=[0,1,2,3] # Les numéros de cartes qui représente un deux
+
+premiere_colonne=[0,13,26,39] # Positions à la première colonne
+derniere_colonne=[12,25,38,51] # Positions à la dernière colonne
+
+nb_cartes_par_rangee=13
+nb_rangee=4
+
+# La fonction melanger prend en paramètre un tableau de 
+# chaîne de caractères représentant les noms des cartes.
+# Elle mélange le contenu de ce tableau en échangeant chaque 
+# carte avec un carte du tableau choisit aléatoirement, en commençant
+# par la dernière et en progressant vers le début du tableau. 
+# La fonction retourne le tableau de cartes mélangés et un tableau
+# de nombres entiers représentant les index des cartes de ce dernier tableau.
 def melanger(paquet): 
     global nouveau_paquet, index_paquet
     nouveau_paquet = paquet.copy()
-    index_paquet=list(range(52))
+    index_paquet=list(range(nb_de_cartes))
     for i in range(51, 0, -1):
-        index_aleatoire = math.floor(random()*52)
+
+        index_aleatoire = math.floor(random()*nb_de_cartes)
         
         # Échanger les cartes dans le paquet
         carte_temporaire = nouveau_paquet[i]
@@ -40,199 +58,262 @@ def melanger(paquet):
         
     return nouveau_paquet,index_paquet
 
-def cartes_vertes(index_cartes):
-    for carte in index_cartes:
+def test_melanger():
+    pass
+
+# La fonction options prend en paramètre un tableau d'entiers représentant
+# les numéros des cartes mélangées et un tableau de chaîne de caractères
+# représentant les noms des cartes mélangées. Elle retourne un tableau
+# de nombres entiers représentant les positions des cartes déplaçables.
+def options(num_cartes,paquet_melange):
+    global position_trous, num_cartes_avant_trous, num_cartes_deplacables , position_carte_deplacable, position_carte_avant_trous
+
+    # Indentifier les positions des trous 
+    position_trous=[]
+    index=0
+    for carte in paquet_melange:
+        if carte=="absent.svg":
+            position_trous.append(index)
+        index+=1
+
+    # Identifier les positions des cartes positionnées avant les trous 
+    position_carte_avant_trous=list(map(lambda position_trou: position_trou-1, position_trous))
+    position_carte_avant_trous = list(filter(lambda position: position>=0, position_carte_avant_trous)) 
+    for position in derniere_colonne:
+        while position in position_carte_avant_trous:
+            position_carte_avant_trous.remove(position)
+    
+
+    # Identifier les cartes positionnées avant les trous
+    num_cartes_avant_trous=[]
+    for position in position_carte_avant_trous:
+        carte=num_cartes[position]
+        num_cartes_avant_trous.append(carte)
+
+    # Identifier les cartes déplaçables
+    num_cartes_deplacables=[]
+    for carte_avant in num_cartes_avant_trous:
+        for carte in num_cartes:
+            # Vérifier s'il y a une séquence croissante de même couleur:
+            if carte%4==carte_avant%4 and carte//4==(carte_avant//4)+1 and carte<48:
+                num_cartes_deplacables.append(carte)                      
+    for position in position_trous:
+        if position in premiere_colonne: # S'il y a un trou dans la première colonne
+            num_cartes_deplacables.append(num_cartes_deux) # Ajouter tous les carte de valeur "2"
+          
+    # Identifier les positions des cartes déplaçables 
+    position_carte_deplacable=[]
+    for position_carte in range(nb_de_cartes):
+        carte=num_cartes[position_carte]
+        if carte in num_cartes_deplacables:
+            position_carte_deplacable.append(position_carte)
+
+    return position_carte_deplacable
+
+def test_options():
+    pass
+
+# La procédure cartes_vartes prend en paramètres un tableau de nombres
+# entiers représentants les positions des cartes qu'il faut mettre en vert.
+# Elle met un fond vert à chaque carte dans le tableau. 
+def cartes_vertes(positions_cartes):
+    for carte in positions_cartes:
         numero_case="#case"+str(carte)
         case=document.querySelector(numero_case)
         case.setAttribute("style", "background-color: lime")
 
-def options(cartes,paquet_melange):
-    global index_trous, cartes_avant_trous, cartes_deplacables , position_carte_deplacable, index_carte_avant_trous
-    premiere_colonne=[0,13,26,39]
-    derniere_colonne=[12,25,38,51]
-    # Indentifier les trous 
-    index_trous=[]
-    index=0
-    for carte in paquet_melange:
-        if carte=="absent.svg":
-            index_trous.append(index)
-        index+=1
+# Intervertir prend en paramètre deux nombres entiers représentant la 
+# position de la carte et la position du trou qu'on doit intervertir.
+# Elle interverti c'est deux cartes et puis met à jour le tableau
+# de nom de cartes et le tableau de ses index associés.
+def intervertir(position_carte,position_trou):
+    # Échanger la position de la carte avec celle du trou:
+    nouveau_paquet[position_trou] = nouveau_paquet[position_carte]
+    nouveau_paquet[position_carte] = 'absent.svg'
 
-    # Identifier les index des cartes positionnées avant les trous 
-    index_carte_avant_trous=list(map(lambda index_trou: index_trou-1, index_trous))
-    index_carte_avant_trous = list(filter(lambda index: index>=0, index_carte_avant_trous)) 
-    for index in derniere_colonne:
-        while index in index_carte_avant_trous:
-            index_carte_avant_trous.remove(index)
-    
+    # Échanger l'index de la carte avec celle du trou:
+    temporaire = index_paquet[position_trou]
+    index_paquet[position_trou] = index_paquet[position_carte]
+    index_paquet[position_carte] = temporaire
 
-    # Identifier les cartes positionnées avant les trous
-    cartes_avant_trous= []
-    for i in index_carte_avant_trous:
-        carte=cartes[i]
-        cartes_avant_trous.append(carte)
+# La fonction gagner vérifie si l'utilisateur a placé toutes les cartes
+# en séquence ascendante, de même couleur, en commençant par un 2. Si c'est 
+# le cas, elle retourne True, sinon elle retourne False.
+def gagner():
+    # Création d'un tableau de tableaux contenant chaque rangée de cartes:
+    rangees = []
+    for premiere_carte in range(0, nb_de_cartes, nb_cartes_par_rangee):
+        derniere_carte=premiere_carte+nb_cartes_par_rangee
+        rangee=index_paquet[premiere_carte:derniere_carte]
+        rangees.append(rangee)
 
-    # Identifier les cartes déplaçables
- 
-    cartes_deplacables=[]
-    for carte_avant in cartes_avant_trous:
-        for carte in cartes:
-            if carte%4==carte_avant%4 and carte//4==(carte_avant//4)+1 and carte<48:
-                cartes_deplacables.append(carte)                      
-    for i in index_trous:
-        if i in premiere_colonne: # S'il y a un trou dans la première colonne
-            for carte in range(4): cartes_deplacables.append(carte) # Ajouter tous les carte de valeur "2"
-          
+    for rangee in rangees:
+        index = 0 
+        # Vérifier si la première carte est un 2:
+        if rangee[index]==num_cartes_deux: 
+            for carte in rangee:
+                if index==0: index+=1 # Ignorer le 2
+                else:
+                    # Vérifier s'il y a une séquence croissante de même couleur:
+                    carte_avant=rangee[index-1]
+                    if carte%4==carte_avant%4 and carte//4==(carte_avant//4)+1 and carte<48:
+                        index+=1
+                    else: return False # S'il n'y as pas séquence croissante de même couleur
+        else: return False # Si la première carte n'est pas un 2
+    return True # L'utilisateur a gagné
 
-    # Identifier les positions des cartes déplaçables 
-    position_carte_deplacable=[]
-    for index_carte in range(52):
-        carte=cartes[index_carte]
-        if carte in cartes_deplacables:
-            position_carte_deplacable.append(index_carte)
-
-
-    return position_carte_deplacable
-
-def intervertir(position,index_trou):
-    nouveau_paquet[index_trou] = nouveau_paquet[position]
-    nouveau_paquet[position] = 'absent.svg'
-
-    temporaire = index_paquet[index_trou]
-    index_paquet[index_trou] = index_paquet[position]
-    index_paquet[position] = temporaire
-
-
-def mise_a_jour(position):
-   
-    # On determine l'index de la carte clique selon sa position dans le paquet mélangé:
-    index_carte_clique = index_paquet[position]
-    #On vérifie si la carte cliqué peut etre déplacer:
-    if position in position_carte_deplacable:
-        for carte in cartes_avant_trous:
+# La procédure mise_a_jour prend en paramètre un nombre entier représentant la carte
+# cliquée par l'utilisateur. Elle vérifie si la carte cliquée peut être déplacée et échange sa position
+# avec celle du trou associé si c'est le cas. De plus, elle met à jour le jeu, 
+# détermine la situation actuelle (gagner, perdre ou besoin de brasser),
+# et met à jour l'affichage HTML en conséquence.
+def mise_a_jour(position_cliquee):
+    # Déterminer l'index de la carte cliquée selon sa position dans le paquet mélangé:
+    index_carte_clique = index_paquet[position_cliquee]
+    # Vérifier si la carte cliqué peut etre déplacée:
+    if position_cliquee in position_carte_deplacable:
+        for carte in num_cartes_avant_trous:
             if index_carte_clique//4 == (carte//4)+1 and index_carte_clique%4==carte%4: 
-                # On determine quel est l'index du trou associe a la carte:
-                index_carte = cartes_avant_trous.index(carte)
-                index_trou_associe = index_carte_avant_trous[index_carte] + 1
-                # On interverti la carte avec le trou  # et met a jour les paquets de cartes et d'indexs:      
-                intervertir(position,index_trou_associe)
+                # Determiner quel est l'index du trou associé a la carte:
+                index_carte = num_cartes_avant_trous.index(carte)
+                index_trou_associe = position_carte_avant_trous[index_carte] + 1
+                # Intervertir la carte avec le trou et mettre a jour les paquets de cartes et d'indexs:      
+                intervertir(position_cliquee,index_trou_associe)
 
-        if index_carte_clique in [0,1,2,3]: # C'est un deux
-            for trou in index_trous:
-                if trou in [0,13,26,39]: # On identifie dans quel ligne de la premiere colonne est le(s) trou.
-                    intervertir(position,trou)
+        # Si l'utilisateur a cliqué sur un 2:
+        if index_carte_clique in num_cartes_deux: 
+            for trou in position_trous:
+                if trou in premiere_colonne: # On identifie dans quel ligne de la premiere colonne est le(s) trou.
+                    intervertir(position_cliquee,trou)
             
         # Mise a jour du jeux selon l'action éffectué par l'utilisateur:
-        situation = gagner()
-        
 
-        position_cartes_deplacables=options(index_paquet,nouveau_paquet)
+        situation = gagner() # Vérifier s'il a gagné 
 
         if situation: 
             situation = 1 # Le joueur a gagné
-        elif cartes_deplacables == [] and nb_de_brasse == 0:
+        elif num_cartes_deplacables == [] and nb_de_brasse == 0:
             situation = 2 # Le joueur a perdu
-        elif cartes_deplacables == [] and nb_de_brasse != 0:
+        elif num_cartes_deplacables == [] and nb_de_brasse != 0:
             situation = 3 # Le joueur doit brasser
 
-        affichage(nouveau_paquet,situation)
-        cartes_vertes(position_cartes_deplacables)
+        position_cartes_deplacables=options(index_paquet,nouveau_paquet)
 
-        
+        # Mise à jour de l'affichage:
+        affichage(nouveau_paquet,situation) 
+        cartes_vertes(position_cartes_deplacables) 
+
+    # S'il y a rien à mettre à jour:
     else:
-        pass
+        pass 
 
+# La procédure brasser est appelée lorsque l'utilisateur appuie sur le bouton lui permettant
+# de brasser les cartes. Cette procédure va mélanger tous les cartes du paquets, sauf celles 
+# déjà bien placées et puis les afficher. 
 def brasser():
     global nouveau_paquet, index_paquet, nb_de_brasse
-    nb_de_brasse-=1
-    paquet=nouveau_paquet.copy()
-    num_cartes=index_paquet.copy()
+
+    nb_de_brasse-=1 
+
+    paquet_initiale=nouveau_paquet.copy()
+    num_cartes_initiale=index_paquet.copy()
+
     positions_carte_a_ne_pas_melanger=[]
     num_cartes_a_ne_pas_melanger=[]
-    nb_rangee=4
+
+    # Parcourir chaque rangée:
     for rangee in range(nb_rangee):
-        index_premiere_carte=rangee*13
-        premiere_carte=num_cartes[index_premiere_carte]
-        if premiere_carte in [0,1,2,3]: # Si la premiere carte de la rangée est un deux
+
+        index_premiere_carte=rangee*nb_cartes_par_rangee
+        premiere_carte=num_cartes_initiale[index_premiere_carte]
+
+        if premiere_carte in num_cartes_deux: # Si la premiere carte de la rangée est un deux
             positions_carte_a_ne_pas_melanger.append(index_premiere_carte)
             num_cartes_a_ne_pas_melanger.append(premiere_carte)
+
             compteur=1 # Initialisation du compteur
-            while compteur<13:
+
+            # Parcourir les autres cartes de la rangée:
+            while compteur<nb_cartes_par_rangee:
                 index_carte_actuelle=index_premiere_carte+compteur
-                carte_actuelle=num_cartes[index_carte_actuelle]
-                carte_avant=num_cartes[index_carte_actuelle-1]
-                if carte_avant%4==carte_actuelle%4==num_cartes[index_premiere_carte]%4 and carte_avant//4==(carte_actuelle//4)-1:
+                carte_actuelle=num_cartes_initiale[index_carte_actuelle]
+                carte_avant=num_cartes_initiale[index_carte_actuelle-1]
+
+                # Vérifier s'il y a une séquence croissante de même couleur:
+                if carte_avant%4==carte_actuelle%4==num_cartes_initiale[index_premiere_carte]%4 and carte_avant//4==(carte_actuelle//4)-1:
                     positions_carte_a_ne_pas_melanger.append(index_carte_actuelle)
                     num_cartes_a_ne_pas_melanger.append(carte_actuelle)
                 else:
                     break
                 compteur+=1
 
+    # Trouver les noms de cartes à ne pas mélanger:
     nom_carte_a_ne_pas_melanger=[]
     for position in positions_carte_a_ne_pas_melanger:
-        nom_carte=paquet[position]
+        nom_carte=paquet_initiale[position]
         nom_carte_a_ne_pas_melanger.append(nom_carte)
 
-    nom_cartes_melanger,index_cartes_melanger=melanger(cartes)
+    # Mélanger le paquet sans prendre en compte les cartes à ne pas mélanger:
+    paquet_melanger,index_cartes_melanger=melanger(cartes)
+
+    # Combiner le paquet initiale et le paquet mélangé en laissant les cartes 
+    # à ne pas mélanger à leur position initale:
     if num_cartes_a_ne_pas_melanger!=[]:
-        i=0
-        n=0
-        while i<52 and n<52:
-            for carte in paquet:
+        paquet_combine=paquet_initiale.copy()
+        num_cartes_combines=num_cartes_initiale.copy() 
+
+        # Initialisation des index pour chaque paquet:
+        index_paquet_combine=0
+        index_paquet_melanger=0
+
+        while index_paquet_melanger<nb_de_cartes:
+            for carte in paquet_combine:
                 if carte in nom_carte_a_ne_pas_melanger:
                     pass
                 else:
-                    while nom_cartes_melanger[n] in nom_carte_a_ne_pas_melanger:
-                        n+=1
+                    # Trouver la prochaine carte mélangée qui ne doit pas rester à sa position initiale:
+                    while paquet_melanger[index_paquet_melanger] in nom_carte_a_ne_pas_melanger:
+                        index_paquet_melanger+=1
                     else:
-                        paquet[i]=nom_cartes_melanger[n]
-                        num_cartes[i]=index_cartes_melanger[n]
-                        n+=1
-                i+=1
-    else:
-        paquet=nom_cartes_melanger
-        num_cartes=index_cartes_melanger
-    nouveau_paquet=paquet
-    index_paquet=num_cartes
+                        # Échanger les cartes dans le paquet combiné:
+                        paquet_combine[index_paquet_combine]=paquet_melanger[index_paquet_melanger]
+                        num_cartes_combines[index_paquet_combine]=index_cartes_melanger[index_paquet_melanger]
+                        index_paquet_melanger+=1
+                index_paquet_combine+=1
+
+        # Mise à jour du paquet et de ses index associés:        
+        nouveau_paquet=paquet_combine
+        index_paquet=num_cartes_combines
+
+    # S'il n'avait pas de cartes à ne pas mélanger:
+    else: 
+        nouveau_paquet=paquet_melanger
+        index_paquet=index_cartes_melanger
+
+    # Mise à jour de l'affichage:    
     affichage(nouveau_paquet,False)
     position_cartes_deplacables=options(index_paquet,nouveau_paquet)
-    # Cartes vertes:
     cartes_vertes(position_cartes_deplacables)
 
+# La procédure recommencer() permet de réinitialiser tout les 
+# variables nécessaires afin de que l'utilisateur puisse recommencer
+# une nouvelle partie.
 def recommencer():
     global nb_de_brasse, nouveau_paquet
-    nb_de_brasse=3
-    nouveau_paquet=cartes
-    init()
+    nb_de_brasse=3 # Réinitialisation du nombres de brasser permise
+    nouveau_paquet=cartes # Réinitialisation de l'ordre des cartes
+    init() 
 
-def gagner():
-    victoire = False
-    lignes = []
-    ligne1 = index_paquet[0:12]
-    ligne2 = index_paquet[13:25]
-    ligne3 = index_paquet[26:38]
-    ligne4 = index_paquet[38:52]
-
-    lignes.append(ligne1)
-    lignes.append(ligne2)
-    lignes.append(ligne3)
-    lignes.append(ligne4)
-
-    for ligne in lignes:
-        index = 0 
-        for carte in ligne:
-            if index in [12,25,38,52]:
-                continue
-            elif carte%4==ligne[index+1]%4 and carte//4==ligne[index+1]//4:
-                index+=1
-            else:
-                return False
-    
-    return True
-
-
+# La procédure affichage prend en paramètre un tableau de chaînes de caractères
+# représentant les noms des cartes mélangés et un nombre entier ou un booléen. Si le nombre entier
+# est égale à 1, l'utilisateur a gagné, si le nombre entier est égale à 2, l'utilisateur
+# a perdu et puis si le nombre entier est égale à 3, l'utilisateur doit brasser.
+# De plus, si le paramètre est égale ou booléen False, c'est qu'on est dans aucunes de ces situations.
+# Cette procédure permet l'affichage des cartes mélangés et des boutons dans le contenu HTML.
 def affichage(nouvelle_liste_cartes,situation):
     global nb_de_brasse
+
+    # Initialisation du contenu HTML 
     contenu_html = (
         "<style>"
         "  #jeu table { float:none; }"
@@ -243,39 +324,32 @@ def affichage(nouvelle_liste_cartes,situation):
         "  <table>"
     )
 
-    index = 0
-    for i in range(4):
+    # Construction du tableau de cartes mélangés:
+    num_case = 0
+    for _ in range(nb_rangee):
         contenu_html += "<tr>"
-        for j in range(13):
-            contenu_html += "<td id='case" + str(index) + "' onclick='mise_a_jour(" + str(index) + ")'><img src='cards/" + nouvelle_liste_cartes[index] + "'></td>"
-            index += 1
+        for _ in range(nb_cartes_par_rangee):
+            contenu_html += "<td id='case" + str(num_case) + "' onclick='mise_a_jour(" + str(num_case) + ")'><img src='cards/" + nouvelle_liste_cartes[num_case] + "'></td>"
+            num_case += 1
         contenu_html += "</tr>" 
     contenu_html += "<table>" 
+
+    # Affichage de messages et boutons en fonction de la situation:
     if not situation:
-        while nb_de_brasse>0:    
+        # Affichage du bouton permettant de brasser s'il est encore possible de brasser:
+        if nb_de_brasse>0:    
             contenu_html += "Vous pouvez encore <button onclick='brasser()'>Brasser les cartes</button> "+str(nb_de_brasse)+" fois"
-            break 
         else: 
-            contenu_html+="Vous ne pouvez plus brasser les cartes"
-            
-
-    elif situation == 1: 
+            contenu_html+="Vous ne pouvez plus brasser les cartes"      
+    elif situation == 1: # S'il a gagné
         contenu_html += "Vous avez réussi!  Bravo!"
-    elif situation == 2: 
+    elif situation == 2: # S'il a perdu
         contenu_html+= "Vous n'avez pas réussi à placer toutes les cartes... Essayez à nouveau!"
-    elif situation == 3: 
+    elif situation == 3: #S'il est obligé de brasser
         contenu_html += "<button onclick='brasser()'>Vous devez brasser.</button>"
-
     contenu_html += "</table>"
+    # Bouton permettant de recommencer la partie
     contenu_html+="<button onclick='recommencer()'>Nouvelle partie</button>"
-
-
-
-
-
-
-
-
 
     racine = document.querySelector("#cb-body")
     racine.innerHTML = contenu_html
@@ -288,11 +362,9 @@ def init():
 
     position_cartes_deplacables=options(index_cartes_melangees,cartes_melangees)
     
-    # Cartes vertes:
     cartes_vertes(position_cartes_deplacables)
 
-    if nb_de_brasse==0 and len(cartes_vertes)==0:
-        print("Vous avez perdu")
+    
 
     
     
