@@ -346,7 +346,8 @@ def brasser():
         index_paquet_combine=0
         index_paquet_melanger=0
 
-        while index_paquet_melanger<nb_de_cartes and index_paquet_combine<nb_de_cartes:
+        while index_paquet_melanger<nb_de_cartes and \
+            index_paquet_combine<nb_de_cartes:
             for carte in paquet_combine:
                 if carte in nom_carte_a_ne_pas_melanger:
                     pass
