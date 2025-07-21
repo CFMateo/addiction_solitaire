@@ -36,7 +36,7 @@ Adaptation de l’affichage HTML avec mise à jour dynamique via le bundle Codeb
 
 ** Exemple de partie: **
 
-![Capture du jeu](./assets/gameplay_simple.gif)
+![Capture du jeu](./assets/gameplay.gif)
 
 
 
