@@ -4,7 +4,7 @@ import http.server
 # Récupère le chemin d'un fichier
 def read_file(path):
     try:
-        with open('.' + path, 'rb') as f:
+        with open('.\documents' + path, 'rb') as f:
             return f.read()
     except FileNotFoundError:
         return None
